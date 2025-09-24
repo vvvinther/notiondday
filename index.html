@@ -34,7 +34,7 @@
 
         <!-- 위젯 설정 뷰 (URL에 정보가 없을 때만 보임) -->
         <div id="setup-view" class="bg-white p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">노션 D-Day 위젯 만들기</h2>
+            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">나만의 D-Day 위젯 만들기</h2>
             <div class="space-y-4">
                 <input type="text" id="event-name-input" class="w-full text-center bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="이벤트 이름 (예: 생일)">
                 <input type="date" id="date-input" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center">
@@ -121,7 +121,37 @@
                         } else if (days === 0) {
                             ddayCounter.textContent = `D-DAY`;
                         } else {
-                            ddayCounter.textContent = `D+${Math.abs(days)}`;
+                            // 날짜가 지난 경우: "Xy Ym" 형식으로 표시 (변경된 부분)
+                            const startDate = new Date(dateParam + 'T00:00:00');
+                            
+                            let years = now.getFullYear() - startDate.getFullYear();
+                            let months = now.getMonth() - startDate.getMonth();
+                            let daysPassed = now.getDate() - startDate.getDate();
+
+                            if (daysPassed < 0) {
+                                months--;
+                                daysPassed += new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                            }
+
+                            if (months < 0) {
+                                years--;
+                                months += 12;
+                            }
+
+                            let displayText = '';
+                            if (years > 0) {
+                                displayText = `${years}y`;
+                                if (months > 0) displayText += ` ${months}m`;
+                            } else if (months > 0) {
+                                displayText = `${months}m`;
+                                if (daysPassed > 0) displayText += ` ${daysPassed}d`;
+                            } else {
+                                displayText = `${daysPassed}d`;
+                            }
+                            
+                            ddayCounter.textContent = displayText;
+                            ddayCounter.classList.remove('text-4xl', 'sm:text-5xl');
+                            ddayCounter.classList.add('text-3xl', 'sm:text-4xl');
                         }
                     }
                     updateDday();
