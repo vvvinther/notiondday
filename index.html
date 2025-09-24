@@ -34,13 +34,25 @@
 
         <!-- 위젯 설정 뷰 (URL에 정보가 없을 때만 보임) -->
         <div id="setup-view" class="bg-white p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">나만의 D-Day 위젯 만들기</h2>
+            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">노션 D-Day 위젯 만들기</h2>
             <div class="space-y-4">
                 <input type="text" id="event-name-input" class="w-full text-center bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="이벤트 이름 (예: 생일)">
                 <input type="date" id="date-input" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center">
                 <div class="w-full bg-white rounded-lg p-3 h-12 flex items-center justify-between border border-gray-300">
                     <label for="color-picker" class="text-sm text-gray-900">글자 색상:</label>
                     <input type="color" id="color-picker" class="w-8 h-8 p-0 border-none rounded-md cursor-pointer" style="background-color: transparent;" value="#111827">
+                </div>
+                <!-- 표시 형식 선택 추가 -->
+                <div class="w-full bg-white rounded-lg p-3 border border-gray-300">
+                    <label class="text-sm text-gray-900 mb-2 block">표시 형식</label>
+                    <div class="flex items-center justify-around">
+                        <label class="flex items-center text-sm cursor-pointer p-2 rounded-md hover:bg-gray-100">
+                            <input type="radio" name="format" value="counter" class="mr-2" checked> D-Day (D±N)
+                        </label>
+                        <label class="flex items-center text-sm cursor-pointer p-2 rounded-md hover:bg-gray-100">
+                            <input type="radio" name="format" value="date" class="mr-2"> 날짜 (Y/M/D)
+                        </label>
+                    </div>
                 </div>
                 <button id="generate-btn" class="w-full bg-gray-900 hover:bg-black text-white font-bold py-3 px-6 rounded-lg transition-colors duration-200 !mt-6">위젯 링크 생성</button>
             </div>
@@ -61,6 +73,7 @@
             const titleParam = params.get('title');
             const dateParam = params.get('date');
             const colorParam = params.get('color');
+            const formatParam = params.get('format'); // 형식 파라미터 가져오기
 
             const displayView = document.getElementById('display-view');
             const setupView = document.getElementById('setup-view');
@@ -82,26 +95,38 @@
                 ddayTitle.style.color = color;
                 ddayCounter.style.color = color;
                 
-                function updateDday() {
-                    const targetDate = new Date(dateParam);
-                    targetDate.setHours(0, 0, 0, 0);
+                if (formatParam === 'date') {
+                    // '날짜' 형식일 때
+                    const targetDate = new Date(dateParam + 'T00:00:00');
+                    const year = targetDate.getFullYear();
+                    const month = String(targetDate.getMonth() + 1).padStart(2, '0');
+                    const day = String(targetDate.getDate()).padStart(2, '0');
+                    ddayCounter.textContent = `${year}/${month}/${day}`;
+                    ddayCounter.classList.remove('text-4xl', 'sm:text-5xl');
+                    ddayCounter.classList.add('text-3xl', 'sm:text-4xl');
+                } else {
+                    // 'D-Day' 형식일 때 (기본값)
+                    function updateDday() {
+                        const targetDate = new Date(dateParam);
+                        targetDate.setHours(0, 0, 0, 0);
 
-                    const now = new Date();
-                    now.setHours(0, 0, 0, 0);
+                        const now = new Date();
+                        now.setHours(0, 0, 0, 0);
 
-                    const difference = targetDate.getTime() - now.getTime();
-                    const days = Math.ceil(difference / (1000 * 60 * 60 * 24));
+                        const difference = targetDate.getTime() - now.getTime();
+                        const days = Math.ceil(difference / (1000 * 60 * 60 * 24));
 
-                    if (days > 0) {
-                        ddayCounter.textContent = `D-${days}`;
-                    } else if (days === 0) {
-                        ddayCounter.textContent = `D-DAY`;
-                    } else {
-                        ddayCounter.textContent = `D+${Math.abs(days)}`;
+                        if (days > 0) {
+                            ddayCounter.textContent = `D-${days}`;
+                        } else if (days === 0) {
+                            ddayCounter.textContent = `D-DAY`;
+                        } else {
+                            ddayCounter.textContent = `D+${Math.abs(days)}`;
+                        }
                     }
+                    updateDday();
+                    setInterval(updateDday, 60000); // 1분마다 업데이트
                 }
-                updateDday();
-                setInterval(updateDday, 60000); // 1분마다 업데이트
 
             } else {
                 // URL에 정보가 없으면: 위젯 생성기 모드
@@ -121,6 +146,7 @@
                     const eventName = eventNameInput.value.trim();
                     const dateValue = dateInput.value;
                     const colorValue = colorPicker.value;
+                    const formatValue = document.querySelector('input[name="format"]:checked').value;
 
                     if (!eventName || !dateValue) {
                         alert('이벤트 이름과 날짜를 모두 입력해주세요!');
@@ -128,7 +154,7 @@
                     }
 
                     const baseUrl = window.location.href.split('?')[0];
-                    const newUrl = `${baseUrl}?title=${encodeURIComponent(eventName)}&date=${dateValue}&color=${encodeURIComponent(colorValue)}`;
+                    const newUrl = `${baseUrl}?title=${encodeURIComponent(eventName)}&date=${dateValue}&color=${encodeURIComponent(colorValue)}&format=${formatValue}`;
                     
                     generatedUrl.textContent = newUrl;
                     resultView.classList.remove('hidden');
