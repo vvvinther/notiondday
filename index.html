@@ -5,10 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>D-Day 위젯 생성기</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        @font-face {
+            font-family: 'Suit';
+            src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_suit@1.0/SUIT-SemiBold.woff2') format('woff2');
+            font-weight: 600;
+            font-display: swap;
+        }
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Suit', sans-serif;
             background-color: transparent;
         }
         .hidden { display: none; }
@@ -23,13 +28,13 @@
     <div id="app-container" class="w-full max-w-sm mx-auto">
         <!-- 디데이 표시 뷰 (URL에 정보가 있을 때만 보임) -->
         <div id="display-view" class="relative text-center p-6">
-            <h2 id="dday-title" class="text-xl sm:text-2xl font-semibold truncate"></h2>
-            <p id="dday-counter" class="text-4xl sm:text-5xl font-bold"></p>
+            <h2 id="d-day-title" class="text-xl sm:text-2xl font-semibold truncate"></h2>
+            <p id="d-day-counter" class="text-4xl sm:text-5xl font-bold"></p>
         </div>
 
         <!-- 위젯 설정 뷰 (URL에 정보가 없을 때만 보임) -->
         <div id="setup-view" class="bg-white p-6 rounded-xl shadow-lg">
-            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">노션 D-Day 위젯 만들기</h2>
+            <h2 class="text-xl font-semibold text-center mb-6 text-gray-900">나만의 D-Day 위젯 만들기</h2>
             <div class="space-y-4">
                 <input type="text" id="event-name-input" class="w-full text-center bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="이벤트 이름 (예: 생일)">
                 <input type="date" id="date-input" class="w-full bg-white text-gray-900 border border-gray-300 rounded-lg p-3 h-12 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-center">
@@ -69,8 +74,8 @@
                 body.classList.add('widget-body');
                 appContainer.classList.remove('max-w-sm'); // 위젯일 땐 너비 제한 풀기
 
-                const ddayTitle = document.getElementById('dday-title');
-                const ddayCounter = document.getElementById('dday-counter');
+                const ddayTitle = document.getElementById('d-day-title');
+                const ddayCounter = document.getElementById('d-day-counter');
 
                 ddayTitle.textContent = decodeURIComponent(titleParam);
                 const color = colorParam ? decodeURIComponent(colorParam) : 'inherit';
@@ -140,3 +145,4 @@
     </script>
 </body>
 </html>
+
